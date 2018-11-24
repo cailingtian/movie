@@ -1,0 +1,244 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link href="css/style.css" rel="stylesheet" />
+		<style type="text/css">
+			.top-image {
+				text-align: center;
+				padding-top: 10px;
+				padding-bottom: 10px;
+				background: #3C3C3C;
+			}
+			.mui-bar-nav {
+				-webkit-box-shadow: none;
+				box-shadow: none;  
+				/*清除标题栏阴影*/
+			}
+			.mui-ellipsis-4 {
+				display:-webkit-box;
+				overflow:hidden;
+				white-space:normal!important;
+				text-overflow:ellipsis;word-wrap:break-word;
+				-webkit-line-clamp:4;
+				-webkit-box-orient:vertical;
+				/*文本四行输出*/
+			}
+			.head-photo {
+				height: 30px;
+				width: 30px;
+				border-radius: 30px;
+			}
+			.mui-table-view {
+				position: relative;
+				margin-top: 0;
+				margin-bottom: 0;
+				padding-left: 0;
+				list-style: none;
+				background-color: #EFEFF4;
+			}
+			
+			.mui-table-view:before {
+				position: absolute;
+				top: 0;
+				right: 0;
+				left: 0;
+				height: 0px;
+				content: '';
+				-webkit-transform: scaleY(.5);
+				transform: scaleY(.5);
+				background-color: #c8c7cc;
+			}
+			
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+		    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		    <h1 class="mui-title">电影</h1>
+		</header>
+		
+		<div class="mui-content" style="background: white;" id="content">
+			<!--1.图片区块-->
+		    <div class="top-image">
+		    	<img :src="cover" style="width: 160px; height: 240px; vertical-align: top;"/>
+		    </div>
+		    <!--2.电影信息区块-->
+		    <div style="padding: 15px; height: 90px;">
+		    	
+		    	<!--左边信息块-->
+		    	<div style="float: left;">
+		    		<span class="dark-big" style="display: block; ">{{title}}</span>
+		    		<span class="gray-small " style="display: block; ">{{year}} / {{countries.toString().replace(/,/g,' / ')}} / {{genres.toString().replace(/,/g,' / ')}} </span>
+		    		<span class="gray-small " style="display: block; ">{{directors.length>0?directors[0].name:''}} 导演作品 </span>
+		    	</div>
+		    	<!--右边信息块-->
+		    	<div style="width: 60px; height: 60px; background: white; box-shadow: 0px 0px 10px #AAAAAA; float: right; text-align: center;" >
+		    		<span class="gray-micro" style="margin-top: 5px; display: block; vertical-align: middle; line-height: 15px;">
+		    			豆瓣评分
+		    		</span>
+		    		<span class="dark-big" style="display: block;line-height: 20px;" v-if="score>0">{{score}}</span>
+					<span class="dark-medium" style="display: block;line-height: 20px;" v-else>暂无评分</span>
+		    		<span class="gray-micro" style="display: block; line-height: 15px;">{{ratingCount}}人</span>
+		    	</div>	
+		    </div>
+		    
+		    <!--4.间隔横线-->
+		    <div style="height: 0.5px; background: #A2A2A2; margin-left: 15px;"></div>
+		    
+		    <!--5.电影简介区块-->
+		    	<p class="gray-small" style="margin: 0px 10px 0px 15px ;">剧情简介</p>
+		    	<p class="mui-ellipsis-4 dark-medium" style="margin: 0px 10px 0px 10px;">{{summary}}</p>
+		   
+		    
+		    <!--6.演员列表区块,横向滑动-->
+		    <p class="gray-small" style="margin: 10px 0px 0px 15px;">演员</p>
+			<div style="overflow-x: scroll; white-space: nowrap; padding-left: 15px;">
+				<div v-for="item in casts" style="display: inline-block;" @click="open_detail(item)">
+					<img :src="item.avatars.medium" style="width: 70px; height: 100px; margin-right: 10px;"/>
+					<span class="dark-micro mui-ellipsis" style="width: 70px; text-align: center;display: block;">
+						{{item.name}}
+					</span>
+				</div>
+			</div>
+				
+			<!--7.评论区块-->
+			<p class="dark-medium" style="margin-top: 10px; text-align: center; line-height: 40px; background: #E6E6E6;">评论</p>
+			
+				<ul class="mui-table-view" style="background: white;">
+					<li class="mui-table-view-cell">
+						<!--评论者头像-->
+						<img src="images/icon_commentphoto.jpg" class="head-photo mui-pull-left" />
+						<!--评论者昵称和发表事件-->
+						<div >
+							<span class="dark-medium" style="line-height: 30px; text-align: center; margin-left: 15px;">北极打边炉</span>
+							<span class="gray-medium" style="line-height: 30px; text-align: center; float: right; margin-right: 5px;">2018-05-01</span>
+						</div>
+						<!--评论内容-->
+						<p class="dark-medium" style="margin-left: 45px;">这部电影非常棒！</p>
+					</li>
+					
+					<li class="mui-table-view-cell">
+						<!--评论者头像-->
+						<img src="images/icon_commentphoto.jpg" class="head-photo mui-pull-left" />
+						<!--评论者昵称和发表事件-->
+						<div >
+							<span class="dark-medium" style="line-height: 30px; text-align: center; margin-left: 15px;">北极打边炉</span>
+							<span class="gray-medium" style="line-height: 30px; text-align: center; float: right; margin-right: 5px;">2018-05-01</span>
+						</div>
+						<!--评论内容-->
+						<p class="dark-medium" style="margin-left: 45px;">这部电影非常棒！</p>
+					</li>
+					
+					<li class="mui-table-view-cell">
+						<!--评论者头像-->
+						<img src="images/icon_commentphoto.jpg" class="head-photo mui-pull-left" />
+						<!--评论者昵称和发表事件-->
+						<div >
+							<span class="dark-medium" style="line-height: 30px; text-align: center; margin-left: 15px;">北极打边炉</span>
+							<span class="gray-medium" style="line-height: 30px; text-align: center; float: right; margin-right: 5px;">2018-05-01</span>
+						</div>
+						<!--评论内容-->
+						<p class="dark-medium" style="margin-left: 45px;">这部电影非常棒！</p>
+					</li>
+				</ul>
+								 	
+		</div>
+		
+		
+		
+		
+	
+		
+		
+		
+		
+		
+		<script src="js/mui.min.js"></script>
+		<script src="js/vue.js"></script>
+		<script type="text/javascript">
+			mui.init()
+			//获取默认数据
+			function getDefaultData() {
+				return{
+					title:'',
+					cover:'',
+					score:'',
+					ratingCount:'',
+					summary:'',
+					countries:'',
+					year:'',
+					genres:'',
+					casts:[],
+					directors:[]
+				}
+			}
+			//vue对象
+			var data_detail = new Vue({
+				el:'#content',
+				data:getDefaultData(),
+				methods:{
+					resetData:function(){//重置数据
+						Object.assign(this.$data,getDefaultData());
+					},
+					open_detail:function(item){
+						//触发详情页面自定义事件
+						mui.fire(webview_detail,'castId',{
+							id:item.id
+						});
+						setTimeout(function() {
+						webview_detail.show("slide-in-right", 300);
+						}, 500);
+					}
+				}
+			});
+			
+			
+			mui.plusReady(function(){
+				var self = plus.webview.currentWebview();
+				//添加hide事件
+				self.addEventListener('hide',function(e){
+					window.scrollTo(0,0);//滚到顶部
+					data_detail.resetData();//数据重置
+				},false);
+				
+				webview_detail = mui.preload({
+					id:'cast-detail',
+					url:'./cast-details.html'
+				});
+			});
+				
+			
+			//添加自定义movieId事件
+			window.addEventListener("movieId",function(event) {
+				//获取事件的参数
+				var id = event.detail.id;
+				console.log(id);	
+				
+				//根据热映列表传递过来的Id请求数据
+				mui.getJSON('http://api.douban.com/v2/movie/subject/'+id,function(resp) {
+					console.log(resp.title);
+					data_detail.title = resp.title;
+					data_detail.cover = resp.images.large;
+					data_detail.score = resp.rating.average;
+					data_detail.ratingCount = resp.ratings_count;//参与评分人数
+					data_detail.summary = resp.summary;//剧情简介
+					data_detail.countries = resp.countries.toString('/,/g',' / ');
+					data_detail.year = resp.year;
+					data_detail.genres = resp.genres.toString('/,/g',' / ');
+					data_detail.casts = resp.casts;
+					data_detail.directors = resp.directors;
+				 });
+				
+			});
+			
+			
+		</script>
+	</body>
+
+</html>

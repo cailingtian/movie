@@ -1,0 +1,55 @@
+{
+  "index.html": {
+    "refer": [
+      "tab-webview-main.html"
+    ]
+  },
+  "tab-webview-main.html": {
+    "resources": [
+      "tab-webview-subpage-about.html"
+    ],
+    "refer": [
+      "tab-webview-subpage-about.html",
+      "tab-webview-subpage-setting.html",
+      "tab-webview-subpage-chat.html",
+      "tab-webview-subpage-contact.html"
+    ]
+  },
+  "tab-webview-subpage-about.html": {
+    "resources": [
+      "css/style.css"
+    ],
+    "refer": [
+      "movie_details.html",
+      "search.html"
+    ]
+  },
+  "movie_details.html": {
+    "refer": [
+      "cast-details.html"
+    ]
+  },
+  "tab-webview-subpage-setting.html": {
+    "refer": [
+      "index.html",
+      "about.html"
+    ]
+  },
+  "tab-webview-subpage-chat.html": {
+    "refer": [
+      "billboard-top.html",
+      "billboard-box.html"
+    ]
+  },
+  "billboard-box.html": {
+    "refer": [
+      "movie_details.html"
+    ]
+  },
+  "search.html": {
+    "refer": [
+      "search-result.html",
+      "srarch_result.html"
+    ]
+  }
+}

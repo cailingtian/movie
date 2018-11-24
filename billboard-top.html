@@ -1,0 +1,196 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link href="css/style.css" rel="stylesheet" />
+		<style>
+			.top-nav{
+				background: white;
+			}
+			.top-index{
+				color: red;
+				font-size: 16px;
+				font-style: italic;
+				width: 30px;
+				display: inline-block;
+				margin-top: 40px;
+				margin-bottom: 15px;
+			}
+			.card{
+				margin-left: 15px;
+				margin-right: 15px;
+				height: 120px;
+				border: 1px solid #C4C4C4;
+				border-radius: 2px;
+				box-shadow: 0px 1px 5px #C4C4C4;
+				padding: 15px;
+				text-align: left;
+			}
+			.line{
+				width: 50px;
+				height: 0.5px;
+				background: #C4C4C4;
+				display: inline-block;
+				vertical-align: middle;
+			}
+			
+		</style>
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+		    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		    <h1 class="mui-title">Top250</h1>
+		</header>
+		<div class="mui-content">
+			<div class="top-nav">
+			    <div id="nav" class="mui-segmented-control mui-segmented-control-inverted">
+			    	<a class="mui-control-item mui-active" tabindex="0">Top1-50</a>
+			    	<a class="mui-control-item" tabindex="1">51-100</a>
+			    	<a class="mui-control-item" tabindex="2">101-150</a>
+			    	<a class="mui-control-item" tabindex="3">151-200</a>
+			    	<a class="mui-control-item" tabindex="4">201-250</a>	
+			    </div>
+			    <div style="height: 0.5px;background: #C4C4C4;"></div>
+		    </div>
+		    
+		    <div id="list" class="mui-scroll-wrapper" style="top: 84.5px; background-color: white;">
+		        <div class="mui-scroll">
+		           <ul style="list-style: none; padding-left: 1px; margin-top: 0px;">
+			          <li v-for="item in list" @click="open_detail(item)">
+			    		<!--标题加横线-->
+			    		<div style="text-align: center;">
+			    			<div class="line"></div>
+			        		<div class="top-index">{{item.sort}}</div>
+			        		<div class="line"></div>
+			    		</div>
+			          	<!--卡片-->
+			          	<div class="card">
+			          		<img :src="item.cover" class="mui-pull-left" style="width: 70px; height: 95px; margin-right: 10px;"/>
+			          		<div class="dark-big">{{item.title}}</div>
+			          		<div style="line-height: 20px;">
+			          			<span class="gray-small">豆瓣评分</span>
+			          			<span class="orange-small">{{item.score}}分</span>	
+			          		</div>
+			          		<div class="gray-small mui-ellipsis" style="display: block; line-height: 20px;">
+			          			导演：{{item.directors}}
+			          		</div>
+			          		<div class="gray-small mui-ellipsis" style="display: block; line-height: 20px;">
+			          			主演：{{item.cast}}
+			          		</div>
+			          	</div>
+			          	
+			          </li>
+		           </ul>
+		        </div>
+		    </div>
+		    
+		</div>
+		
+		<script src="js/mui.min.js"></script>
+		<script src="js/vue.js"></script>
+		<script type="text/javascript">
+			mui.init()
+			//给顶部选项卡添加点击事件
+			mui('#nav').on('tap','a',function(){
+			 getData(this.getAttribute('tabIndex')*50);
+			});
+			
+			var detailPage = null;
+			//创建Vue对象
+			//vue对象
+			var movies = new Vue({
+				el:'#list',
+				data:{
+					list:[]
+				},
+				methods:{
+					open_detail:function(item){
+						//触发详情页面自定义事件
+						mui.fire(webview_detail,'movieId',{
+							id:item.id
+						});
+						setTimeout(function() {
+						webview_detail.show("slide-in-right", 300);
+						}, 500);
+					}
+				}
+			});
+			//预加载详情页
+			mui.plusReady(function(){
+				webview_detail = mui.preload({
+					id:'movie_detail',
+					url:'./movie_details.html'
+				});
+				//获取1-50
+				getData(0);
+			})
+			
+			//初始化滑动组件
+			//初始化scroll
+			mui('.mui-scroll-wrapper').scroll({
+				indicators:true
+			});
+			//获取接口数据
+			function getData(start){
+				//原生加载控件
+				plus.nativeUI.showWaiting('加载中',{
+					height:'100px',
+					width:'100px'
+				});
+				mui.getJSON('http://api.douban.com/v2/movie/top250',{
+					start:start,
+					count:50
+				},function(resp){
+					console.log(resp);
+					plus.nativeUI.closeWaiting();
+					movies.list = convert(resp);
+					mui('.mui-scroll-wrapper').scroll().scrollTo(0,0,100);//列表滚动到顶部
+				});
+			}
+			
+			//数据处理
+			function convert(obj){
+				var newItems = [];
+				var items = obj.subjects;
+				for(var i=0; i<items.length; i++){
+					var item = items[i];
+					//处理导演数据
+					var directorStr = '';
+					for(var k = 0; k < item.directors.length; k++){
+						directorStr += item.directors[k].name;
+						if(k != item.directors.length- 1 ){
+							directorStr +=' / ';
+						}
+					}
+					
+					//处理演员数据
+					var castStr = '';
+					for(var k=0; k<item.casts.length; k++){
+						castStr += item.casts[k].name;
+						if(k != item.casts.length- 1 ){
+							castStr +=' / ';
+						}
+					}
+					
+					newItems.push({
+						sort:i+obj.start+1,
+						id:item.id,
+						directors:directorStr,
+						cast:castStr,
+						score:item.rating.average,
+						title:item.title,
+						cover:item.images.medium
+					});
+					
+				}
+				return newItems;
+			};
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link href="css/style.css" rel="stylesheet" />
+		<style type="text/css">
+			/*顶部图片*/
+			.top-image{
+				text-align: center;
+				padding-top: 10px;
+				padding-bottom: 10px;
+				background: #18D7D7;
+			}
+			
+			.mui-bar-nav {
+				-webkit-box-shadow: none;
+				box-shadow: none;  
+				/*清除标题栏阴影*/
+			}
+		</style>
+	</head>
+	
+
+	<body>
+		<header class="mui-bar mui-bar-nav">
+		    <a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		    <h1 class="mui-title">影人</h1>
+		</header>
+		
+		<div class="mui-content">
+			<!--1.顶部图片-->
+		    <div class="top-image">
+		    	<img :src="cover" style="width: 160px; height: 240px; vertical-align: top;"/>
+		    </div>
+		   <!--演员基础信息-->
+		   <div style="padding-left: 15px;">
+		   		<div class="dark-big">
+		   			{{name}}
+		   		</div>
+		   		<div class="gray-medium">
+		   			{{enname}}
+		   		</div>
+		   		<div class="gray-small">
+		   			个人简介	
+		   		</div>
+		   		<div class="dark-medium">
+		   			{{summary}}	
+		   		</div> 	
+		   </div>
+		   
+		   <!--3.0间隔横线-->
+		    <div style="height: 0.5px; background: #A2A2A2; margin: 10px 15px 10px 15px;"></div>
+		   
+		   <!--4.0代表作品-->
+		   <div class="gray-small" style="padding: 5px 15px 10px 15px;">
+		     代表作品
+		   </div>
+		   
+		   <div v-for="item in works" style="overflow-x: auto; white-space: nowrap; padding-left: 15px;float: left;">
+		   		<img :src="item.subject.images.medium" style="width: 70px; height: 100px; margin-right: 10px;"/>
+		   		<div class="dark-micro mui-ellipsis" style="width: 70px; text-align: center;">
+		   			{{item.subject.title}}
+		   		</div>
+		   		<div class="orange-micro mui-ellipsis" style="width: 70px; text-align: center; line-height: 15px;padding-bottom: 10px;">
+		   			{{item.subject.rating.average}}分
+		   		</div>
+		   		
+		   </div>
+		   
+		   
+		</div>
+		
+		
+		
+		
+		<script src="js/mui.min.js"></script>
+		<script src="js/vue.js"></script>
+		<script type="text/javascript">
+			mui.init()
+			//默认数据
+			function getDefaultData(){
+				return{
+					name:'',
+					enname:'',
+					cover:'',
+					summary:'',
+					works:[]
+				}	
+			}
+			
+			//Vue对象
+			var data_detail = new Vue({
+				el:'.mui-content',
+				data:getDefaultData(),
+				methods:{
+					resetData:function(){//重置数据
+						Object.assign(this.$data,getDefaultData());
+					}
+				}
+				
+			});
+			
+			mui.plusReady(function(){
+				var self = plus.webview.currentWebview();
+				//添加hide事件
+				self.addEventListener('hide',function(e){
+					window.scrollTo(0,0);//滚到顶部
+					data_detail.resetData();//数据重置
+				},false);
+				
+			});
+			
+			window.addEventListener("castId",function(event) {
+				//获取事件的参数
+				var id = event.detail.id;
+				console.log(id);
+				//获取数据
+				mui.getJSON('http://api.douban.com/v2/movie/celebrity/'+id,function(resp){
+					data_detail.name = resp.name;
+					console.log(data_detail.name);
+					data_detail.enname = resp.name_en;
+					data_detail.cover = resp.avatars.large;
+					data_detail.summary = resp.name + ',' + resp.gender + ',' + resp.born_place;
+					data_detail.works = resp.works;
+					plus.nativeUI.closeWaiting();
+				});
+			});
+			
+			
+		</script>
+	</body>
+
+</html>
